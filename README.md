@@ -99,4 +99,6 @@ win.blit(bg, (width+i, 0))
 
 [Part-06-Animation.py](Part-06-Animation.py)
 
-No particular sprite routines really using
+No particular sprite routines really using blit, load series of png to animate
+
+## Objects

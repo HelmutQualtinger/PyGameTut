@@ -9,26 +9,10 @@ win = pygame.display.set_mode((win_width, win_height))
 
 # Load and Size Images
 stationary = pygame.image.load(os.path.join("Assets/Hero", "standing.png"))
-left = [pygame.image.load(os.path.join("Assets/Hero", "L1.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L2.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L3.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L4.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L5.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L6.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L7.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L8.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "L9.png"))
-        ]
-right =[pygame.image.load(os.path.join("Assets/Hero", "R1.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R2.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R3.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R4.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R5.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R6.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R7.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R8.png")),
-        pygame.image.load(os.path.join("Assets/Hero", "R9.png"))
-        ]
+
+left =[pygame.transform.scale(pygame.image.load(os.path.join("Assets/Hero", f"L{i}.png")), (192, 192)) for i in range (1, 10)]
+right =[pygame.transform.scale(pygame.image.load(os.path.join("Assets/Hero", f"R{i}.png")), (192, 192)) for i in range (1, 10)]
+
 background = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "Background.png")), (win_width, win_height))
 
 class Hero:
@@ -86,7 +70,8 @@ def draw_game():
     pygame.display.update()
 
 # Instance of Hero-Class
-player = Hero(250, 290)
+player = Hero(250, 160)
+              
 
 # Mainloop
 run = True
