@@ -1,5 +1,5 @@
 # Pygame learning
-watched [following videos](https://www.youtube.com/watch?v=cFq3dKa6q0o&t=337s
+watched [following videos](https://www.youtube.com/watch?v=cFq3dKa6q0o&t=337s)
 
 ## first video:
 
