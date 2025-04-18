@@ -66,3 +66,37 @@ while True:
 - `pygame.display.update()` update the screen
 
 ## constraining movements
+
+in video lots of if and comparison, but min max suggested by Gemini is much less verbose and elegant.
+
+    y = min(max(y, radius), 500 - radius)
+    x = min(max(x, radius), 500 - radius)
+
+## changing speed in accordance with Newton and jump
+[jumping.py](jumping.py)
+
+Make the velocity variable. Change it when at each iteration.
+pygame.event.key.get_pressed() returns a dictionary with all pressed keys
+
+## having a running background
+[background.py](background.py)]
+Load a png file
+
+```py
+win = pygame.display.set_mode((1000, 500))
+bg_img = pygame.image.load(os.path.join("Assets","Background.png"))
+bg = pygame.transform.scale(bg_img, (1000, 500))
+```
+
+blitting images into other images
+
+```py
+win.blit(bg, (0+i, 0))
+win.blit(bg, (width+i, 0))
+````
+
+## running characters and sprites
+
+[Part-06-Animation.py](Part-06-Animation.py)
+
+No particular sprite routines really using
