@@ -102,3 +102,21 @@ win.blit(bg, (width+i, 0))
 No particular sprite routines really using blit, load series of png to animate
 
 ## Objects
+[Part-07-Objects.py](Part-07-Objects.py)
+
+Combination of left right running with sequence of sprites and jumping
+
+
+Draw player class
+draws left, right or front facing sprite, Step Index cycles through mini film
+
+## Shooting
+[Part-08-Shooting.py](Part-08-Shooting.py)
+Shoot bullets. New sprite. Bit of care placing the bullets and moving them.
+
+## Cool down
+
+Limit bullets, kill off screen bullets.
+[Part-09-CoolDown.py](Part-09-CoolDown.py)
+
+## Enemies]

@@ -31,4 +31,4 @@ while run:
         y += vel
 
     pygame.time.delay(10)
-    pygame.display.update()
+    pygame.display.flip()

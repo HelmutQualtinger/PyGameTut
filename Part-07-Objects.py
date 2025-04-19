@@ -3,15 +3,16 @@ import os
 
 # Init and Create Window (win)
 pygame.init()
-win_height = 400
-win_width = 800
-win = pygame.display.set_mode((win_width, win_height))
+win_height = 800
+win_width = 1200
+win = pygame.display.set_mode((win_width, win_height), pygame.DOUBLEBUF | pygame.HWSURFACE)
 
 # Load and Size Images
-stationary = pygame.image.load(os.path.join("Assets/Hero", "standing.png"))
+stationary = pygame.transform.scale(pygame.image.load(os.path.join("Assets/Hero", "standing.png")), (64*3/2, 64*3/2))
 
-left =[pygame.transform.scale(pygame.image.load(os.path.join("Assets/Hero", f"L{i}.png")), (192, 192)) for i in range (1, 10)]
-right =[pygame.transform.scale(pygame.image.load(os.path.join("Assets/Hero", f"R{i}.png")), (192, 192)) for i in range (1, 10)]
+left =[pygame.transform.scale(pygame.image.load(os.path.join("Assets/Hero", f"L{i}.png")), (64*3/2, 64*3/2)) for i in range (1, 10)]
+right =[pygame.transform.scale(pygame.image.load(os.path.join("Assets/Hero", f"R{i}.png")), (64*3/2, 64*3/2)) for i in range (1, 10)]
+
 
 background = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "Background.png")), (win_width, win_height))
 
@@ -22,7 +23,7 @@ class Hero:
         self.y = y
         self.velx = 10
         self.vely = 10
-        self.face_right = True
+        self.face_right = False
         self.face_left = False
         self.stepIndex = 0
         # Jump
@@ -38,17 +39,22 @@ class Hero:
             self.face_right = False
             self.face_left = True
         else:
+            self.face_right = False
+            self.face_left = False
             self.stepIndex = 0
 
     def draw(self, win):
-        if self.stepIndex >= 9:
-            self.stepIndex = 0
+
         if self.face_left:
             win.blit(left[self.stepIndex], (self.x, self.y))
             self.stepIndex += 1
-        if self.face_right:
+        elif self.face_right:
             win.blit(right[self.stepIndex], (self.x, self.y))
             self.stepIndex += 1
+        else:
+            win.blit(stationary, (self.x, self.y))
+        self.stepIndex += 1
+        self.stepIndex %= 9
 
     def jump_motion(self, userInput):
         if userInput[pygame.K_SPACE] and self.jump is False:
@@ -63,14 +69,13 @@ class Hero:
 
 # Draw Game
 def draw_game():
-    win.fill((0, 0, 0))
     win.blit(background, (0,0))
     player.draw(win)
     pygame.time.delay(30)
-    pygame.display.update()
+    pygame.display.flip()
 
 # Instance of Hero-Class
-player = Hero(250, 160)
+player = Hero(250, 400*3/2)
               
 
 # Mainloop
@@ -79,16 +84,12 @@ while run:
 
     # Quit Game
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and (event.key == pygame.K_ESCAPE or event.key == pygame.K_q)):
             run = False
-
     # Input
     userInput = pygame.key.get_pressed()
-
     # Movement
     player.move_hero(userInput)
     player.jump_motion(userInput)
-
     # Draw Game in Window
     draw_game()
-
