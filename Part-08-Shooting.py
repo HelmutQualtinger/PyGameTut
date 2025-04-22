@@ -8,7 +8,7 @@ win_height = 400
 # Load images for the hero's stationary, left, and right movements
 
 def load_artwork():
-    global stationary, left, right, bullet_img, background,win_height, win_width
+    global stationary, left, right, bullet_img, background,win_height, win_width, right_enemy, left_enemy, font
     stationary = pygame.image.load(os.path.join("Assets/Hero", "standing.png"))
     left =  [pygame.image.load(os.path.join("Assets/Hero", f"L{i}.png")) for i in range (1, 10)]
     right = [pygame.image.load(os.path.join("Assets/Hero", f"R{i}.png")) for i in range (1, 10)]
@@ -16,6 +16,21 @@ def load_artwork():
     bullet_img = pygame.transform.scale(pygame.image.load(os.path.join("Assets/Bullets", "light_bullet.png")), (10, 10))
     background = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "Background.png")), (win_width, win_height))
 
+# Load enemy images
+    left_enemy = [ pygame.image.load(os.path.join("Assets/Enemy", f"L{i}E.png")) for i in range (1, 9)] + \
+            [ pygame.image.load(os.path.join("Assets/Enemy", f"L{i}P.png")) for i in range (9, 12)]
+    left_enemy = [pygame.transform.scale(img, (img.get_width() * 1, img.get_height() * 1)) for img in left_enemy]
+    right_enemy = [pygame.image.load(os.path.join("Assets/Enemy", f"R{i}E.png")) for i in range (1, 9)] + \
+                [pygame.image.load(os.path.join("Assets/Enemy", f"R{i}P.png")) for i in range (9, 12)]
+    right_enemy = [pygame.transform.scale(img, (img.get_width() * 1, img.get_height() * 1)) for img in right_enemy]
+    for i in range(len(right_enemy)):
+        right_enemy[i].set_alpha(255)
+    for i in range(len(left_enemy)):
+        left_enemy[i].set_alpha(255)
+       
+                
+
+# Load and Resize Image
 class Hero:
     """Represents the main player character in the game."""
     def __init__(self, x, y):
@@ -32,6 +47,7 @@ class Hero:
         # Bullet
         self.bullets = []
         self.cooldown = 0
+        self.health = 100
 
     def move_hero(self, userInput):
         """Moves the hero based on user input (left or right arrow keys)."""
@@ -56,10 +72,21 @@ class Hero:
         if self.face_right:
             win.blit(right[self.stepIndex], (self.x, self.y))
             self.stepIndex += 1
+        # draw empty rectangle for the hero
+        if self.hit():
+            color = (255, 0, 0)
+        else:
+            color = (0, 255, 0)
+            
+        
+
+        pygame.draw.rect(win, color, (self.x+20, self.y+12, 23, 40), 2)  # Draw a red rectangle for the hero
+        pygame.draw.rect(win, (0, 255, 0), (self.x, self.y+64, 30, 10)) # Draw a green  rectangle for the hero's damage
+        pygame.draw.rect(win, (255, 00, 0), (self.x, self.y+64, 30-self.health, 10))  # Draw a green background rectangle for the hero
 
     def jump_motion(self, userInput):
         """Handles the hero's jump motion."""
-        if userInput[pygame.K_SPACE] :
+        if userInput[pygame.K_SPACE] or userInput[pygame.K_UP]:
             self.jump = True
         if self.jump:
             self.y -= self.vely*4
@@ -84,11 +111,67 @@ class Hero:
         elif self.cooldown > 0:
             # Decrement the cooldown if it's active
             self.cooldown -= 1
-        self.bullets = list(filter(lambda bullet: not bullet.off_screen(), self.bullets))
-        # Filter out bullets that are off-screen and move the remaining bullets
         for bullet in self.bullets:
             bullet.move()
+        self.bullets = list(filter(lambda bullet: not bullet.off_screen(), self.bullets))
+           
+    def hit(self):
+        """Handles the enemy being hit by a bullet."""
+        # You can implement the logic for when the enemy is hit here
+        for enemy in enemies:
+            if self.x <= enemy.x <= self.x + 50 and self.y <= enemy.y <= self.y + 50:
+# enemy hit by Hero
+                self.health -= 5
+                print ("Hero hit by goblin!")
+                return True
+        return False
+
+
+
                  
+class Enemy:
+    """Represents an enemy in the game."""
+    def __init__(self, x, y, direction):
+        self.x = x
+        self.y = y
+        self.velx = 5
+        self.direction = direction  # 1 for right, -1 for left
+        self.stepIndex = 0
+        self.health = 30
+
+    def move(self):
+        """Moves the enemy horizontally and changes direction if it hits the window boundaries."""
+        self.x += self.velx * self.direction
+        if self.x <= 0 or self.x >= win_width :
+            self.direction *= -1
+
+    def draw(self, win):
+        if self.direction == 1:
+            win.blit(right_enemy[self.stepIndex], (self.x, self.y))
+        if self.direction == -1:
+            win.blit(left_enemy[self.stepIndex], (self.x, self.y))
+            
+        color = (255, 0, 0,12) if self.hit() else (0, 255, 0,10)
+        pygame.draw.rect(win, color, (self.x+15, self.y+10, 28, 50), 2)  # Draw a red rectangle for the enemy
+        # Draw health bar
+        pygame.draw.rect(win, (0, 255, 0,10), (self.x, self.y+64, 30, 10))  # Draw a green background rectangle for the enemy
+        pygame.draw.rect(win, (255, 0, 0,10), (self.x, self.y+64, 30 - self.health, 10)) # Draw a red rectangle for the enemy's damege
+    
+        self.stepIndex += 1
+        self.stepIndex %= 11  # Loop through the animation frames
+        
+    def hit(self):
+        """Handles the enemy being hit by a bullet."""
+        # You can implement the logic for when the enemy is hit here
+        for bullet in player.bullets:
+            if self.x <= bullet.x <= self.x + 50 and self.y <= bullet.y <= self.y + 50:
+                    # Remove the bullet and the enemy from the game
+                    print ("Enemy hit by bullet!")
+                    self.health -= 1
+                    player.bullets.remove(bullet)
+                    return True
+        return False
+
 class Bullet:
     """Represents a bullet fired by the hero."""
     def __init__(self, x, y, direction):
@@ -112,29 +195,41 @@ class Bullet:
         return not(self.x >= 50 and self.x <= win_width-50)
 
 # Draw Game
-def draw_game(win):    
+def draw_game(win, font):    
     """Draws all game elements on the window."""
+    global player, enemies
     win.blit(background, (0,0))
-    player.draw(win)
     for bullet in player.bullets:
         bullet.draw_bullet(win)
-    pygame.time.delay(30)
+    player.draw(win)
+    for enemy in enemies:
+        enemy.draw(win)
+    text = font.render('Health: ' + str(player.health), True, "yellow")
+    win.blit(text, (10, 10))
+
+    pygame.time.delay(60)
     pygame.display.flip()
+
 
 
 
 # Mainloop
 # Instance of Hero-Class
 def main():
-    global stationary, left, right, bullet_img, background,win_height, win_width
+    global stationary, left, right, bullet_img, background,win_height, win_width,enemies
     load_artwork()
     global player
-    player = Hero(250, 290)
+
     pygame.init()
     win_height = 400
     win_width = 800
-    win = pygame.display.set_mode((win_width, win_height))
+    win = pygame.display.set_mode((win_width, win_height), pygame.HWSURFACE | pygame.DOUBLEBUF)
     run = True
+    font = pygame.font.Font('freesansbold.ttf', 18)     
+    
+    enemies = [ Enemy(100, 190, 1), Enemy(400, 240, -1), Enemy(600, 290, 1) ]
+    player = Hero(250, 290)
+    print(enemies)
     while run:
         # Quit Game
         for event in pygame.event.get():
@@ -144,15 +239,20 @@ def main():
         # Input
         userInput = pygame.key.get_pressed()
 
+        if userInput[pygame.K_ESCAPE] or userInput[pygame.K_q]:
+            run = False 
         # Shoot
         player.shoot(userInput)
 
         # Movement
         player.move_hero(userInput)
         player.jump_motion(userInput)
+        
+        for enemy in enemies:
+            enemy.move()
 
         # Draw Game in Window
-        draw_game(win)
+        draw_game(win, font)
 
 
 if __name__ == "__main__":

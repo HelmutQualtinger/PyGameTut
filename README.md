@@ -120,3 +120,16 @@ Limit bullets, kill off screen bullets.
 [Part-09-CoolDown.py](Part-09-CoolDown.py)
 
 ## Enemies]
+
+created very much like player  Collisions and hitboxes
+
+##  Collisions and hitboxes
+
+implement hit methods called in the draw method to check wether we were hit
+comparison is done in python not in the pygame collision
+
+## Health bars.
+
+rectangles in multiple colors over the figure.
+
+## lives
