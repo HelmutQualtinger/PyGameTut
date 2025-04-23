@@ -21,29 +21,31 @@ def load_artwork():
     
     pygame.mixer.music.load(os.path.join("Assets/Audio", "music.ogg"))
     pop_sound = pygame.mixer.Sound(os.path.join("Assets/Audio", "pop.ogg"))
-    quake_sound = pygame.mixer.Sound(os.path.join("Assets/Audio", "quake.mp3"))
+    quake_sound = pygame.mixer.Sound(os.path.join("Assets/Audio", "crash.mp3"))
     pygame.mixer.music.play(-1)
 
 
 class Hero(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.images_right = right
-        self.images_left = left
-        self.image = stationary
-        self.rect = self.image.get_rect(topleft=(x, y))
-        self.velx = 10
-        self.vely = 10
+        self.images_right = right # frames when moving right
+        self.images_left = left # frames when moving left
+        self.image = stationary # frame facing player
+        self.rect = self.image.get_rect(topleft=(x, y)) # where the player starts
+        self.velx = 10 # standard speed
+        self.vely = 10 # standard jump speed
         self.face_right = True
         self.face_left = False
-        self.stepIndex = 0
-        self.jump = False
-        self.bullets = pygame.sprite.Group()
-        self.cooldown = 0
-        self.health = 30
-        self.lives = 3
+        self.stepIndex = 0   # index of the current frame
+        self.jump = False    # indicates if the hero is jumping
+        self.bullets = pygame.sprite.Group()  # all fired bullets until the hit somethin of leave the screen
+        self.cooldown = 0  # cooldown for shooting
+        self.health = 30    # health of the player
+        self.lives = 3      # lives of the player
+        
     def __repr__(self):
         return super().__repr__()+f"right: {self.face_right}, left: {self.face_left}, health: {self.health} rect: {self.rect}, jump: {self.jump}, cooldown: {self.cooldown}"
+    
     def update(self, userInput):
         if userInput[pygame.K_RIGHT] and self.rect.x <= win_width - 62:
             self.rect.x += self.velx
