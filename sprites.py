@@ -1,11 +1,12 @@
 import pygame
 import os
+import math
 
 win_width = 800
 win_height = 400
 
 def load_artwork():
-    global stationary, left, right, bullet_img, background, win_height, win_width, right_enemy, left_enemy,castle
+    global stationary, left, right, bullet_img, background, win_height, win_width, right_enemy, left_enemy,castle,pop_sound,quake_sound
     stationary = pygame.image.load(os.path.join("Assets/Hero", "standing.png"))
     left =  [pygame.image.load(os.path.join("Assets/Hero", f"L{i}.png")) for i in range (1, 10)]
     right = [pygame.image.load(os.path.join("Assets/Hero", f"R{i}.png")) for i in range (1, 10)]
@@ -17,6 +18,12 @@ def load_artwork():
                   [pygame.image.load(os.path.join("Assets/Enemy", f"R{i}P.png")) for i in range(9, 12)]
                   
     castle = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "Tower.png")), (200, 200))
+    
+    pygame.mixer.music.load(os.path.join("Assets/Audio", "music.ogg"))
+    pop_sound = pygame.mixer.Sound(os.path.join("Assets/Audio", "pop.ogg"))
+    quake_sound = pygame.mixer.Sound(os.path.join("Assets/Audio", "quake.mp3"))
+    pygame.mixer.music.play(-1)
+
 
 class Hero(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -59,9 +66,11 @@ class Hero(pygame.sprite.Sprite):
             self.vely = 10
 
     def shoot(self, userInput):
+        global pop_sound
         if userInput[pygame.K_f] and not self.cooldown:
             bullet = Bullet(self.rect.x, self.rect.y, 1 if self.face_right else -1)
             self.bullets.add(bullet)
+            pop_sound.play()
             self.cooldown = 3
         elif self.cooldown > 0:
             self.cooldown -= 1
@@ -79,8 +88,8 @@ class Hero(pygame.sprite.Sprite):
  #       pygame.draw.rect(win, (0, 0, 0), self.rect,1)  # Hit box
         win.blit(self.image, self.rect.topleft)
         self.bullets.draw(win)
-        pygame.draw.rect(win, (0, 255, 0), (self.rect.x, self.rect.y+64, 30, 10))
-        pygame.draw.rect(win, (255, 0, 0), (self.rect.x, self.rect.y+64, 30-self.health, 10))
+        pygame.draw.rect(win, (0, 255, 0), (self.rect.x+15, self.rect.y+64, 30, 10))
+        pygame.draw.rect(win, (255, 0, 0), (self.rect.x+16, self.rect.y+64, 30-self.health, 10))
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, direction,name):
@@ -105,8 +114,8 @@ class Enemy(pygame.sprite.Sprite):
     def draw(self, win):
         win.blit(self.image, self.rect.topleft)
 #        pygame.draw.rect(win, (0, 0, 0), (self.rect.x+15, self.rect.y+4, 32, 64),1)  # Hit box
-        pygame.draw.rect(win, (0, 255, 0), (self.rect.x, self.rect.y+64, 30, 10))
-        pygame.draw.rect(win, (255, 0, 0), (self.rect.x, self.rect.y+64, 30-self.health, 10))
+        pygame.draw.rect(win, (0, 255, 0), (self.rect.x+15, self.rect.y+64, 30, 10))
+        pygame.draw.rect(win, (255, 0, 0), (self.rect.x+15, self.rect.y+64, 30-self.health, 10))
     
     def __repr__(self):
         return super().__repr__()+f"Enemy {self.name}, health: {self.health} rect: {self.rect} stepIndex: {self.stepIndex}"
@@ -131,23 +140,53 @@ class Bullet(pygame.sprite.Sprite):
     def off_screen(self):
         return not (0 <= self.rect.x <= win_width)
     
+# Castle
+class Castle(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        global castle
+        self.castle_hit = 0
+        self.image = castle
+        self.rect = self.image.get_rect(topleft=(x, y))
+    def update(self):        
+        global castle_health
+#        self.rect = self.image.get_rect(topleft=(-50, win_height - 220))
+        self.rect.y = 140 + (10 - castle_health) * 20
+        if self.castle_hit>0 and castle_health > 0:
+            shake =math.sin(self.castle_hit)*10
+            self.rect.x = -50 + shake
+            self.castle_hit -= 1
+         
+    def draw(self, win):
+        pass
+        global music
+        music = pygame.mixer.music.load(os.path.join("Assets/Audio", "music.ogg"))
+        pygame.mixer.music.play(-1)
+
+
+    
 def draw_game(win, font, player, enemies):
-    global kills
+    global kills,castle_health,castle_group
     win.blit(background, (0,0))
     player.draw(win)
     for enemy in enemies:
         enemy.draw(win)
+    castle_group.draw(win)
     text = font.render('Health: ' + str(player.health), True, "darkred")
     win.blit(text, (10, 10))
     text = font.render('Lives: ' + str(player.lives), True, "darkred")
     win.blit(text, (10, 30))
     text = font.render('Kills: ' + str(kills), True, "darkred")
     win.blit(text, (10, 50))
-    win.blit(castle, (-50, win_height - 220))
-    pygame.display.flip()
+    text = font.render('Castle Health: ' + str(castle_health), True, "darkred")
+    win.blit(text, (10, 70))
+
+
+
 
 def main():
-    global stationary, left, right, bullet_img, background, win_height, win_width,kills
+    global stationary, left, right, bullet_img, background 
+    global win_height, win_width,kills,castle_health, castle,castle_obj,castle_group,enemies
     kills = 0
     pygame.init()
     load_artwork()
@@ -157,9 +196,15 @@ def main():
     player = Hero(250, 290)
     enemies = pygame.sprite.Group(
         Enemy(600, 290, 1, "Hugo")
+        
     )
+    castle_health = 10
+    castle_obj      = Castle(-50, win_height - 220)
+    castle_group = pygame.sprite.Group()
+    castle_group.add(castle_obj)
     run = True
     while run:
+        pygame.time.Clock().tick(60)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -169,6 +214,7 @@ def main():
         player.shoot(userInput)
         player.update(userInput)
         enemies.update()
+        castle_obj.update()
 
         # Kollisionsabfrage: Bullet trifft Enemy
         hits = pygame.sprite.groupcollide(player.bullets, enemies, True, False)
@@ -184,7 +230,7 @@ def main():
         # Kollisionsabfrage: Enemy trifft Hero
         for i, enemy in enumerate(pygame.sprite.spritecollide(player, enemies, False)):            
             if pygame.sprite.collide_mask(player, enemy):
-                print("Mask Collision with ", enemy)
+#                print("Mask Collision with ", enemy)
                 player.health -= 1
                 if player.health <= 0:
                     print("Killed by ", enemy)
@@ -194,8 +240,22 @@ def main():
                         print("Game Over")
                         game_over = True
             else:
-                print("Masks not colliding")
-#            print(i," Player ",str(player)+" Enemy "+str(enemy))
+                pass
+#                print("Masks not colliding")
+
+#       # Kollisionsabfrage: Enemy trifft Castle
+        for enemy in pygame.sprite.spritecollide(castle_obj, enemies, False):
+            if pygame.sprite.collide_mask(castle_obj, enemy):
+                enemy.kill()
+                enemies.add(Enemy(750, 290, -1, "Hugo"))
+                castle_obj.castle_hit = 120
+                quake_sound.play()
+                castle_health -= 1
+                if castle_health <= 0:
+                    print("Castle destroyed")
+                    game_over = True
+            
+            
 
         if game_over:
             text = font.render('Game Over, Press r to restart', True, "red")
@@ -203,15 +263,20 @@ def main():
             pygame.display.flip()
             if userInput[pygame.K_r]:
                 game_over = False
+                kills = 0
+                castle_health = 10
                 player.health = 30
                 player.lives = 3
                 enemies.empty()
                 enemies.add(Enemy(600, 290, 1, "Hugo"))
                 pygame.time.delay(20)
         else:
+
             draw_game(win, font, player, enemies)
 
-        pygame.time.delay(10)
+            pygame.display.flip()
+
+
     pygame.quit()
 
 if __name__ == "__main__":
