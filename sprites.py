@@ -12,11 +12,11 @@ def load_artwork():
     right = [pygame.image.load(os.path.join("Assets/Hero", f"R{i}.png")) for i in range (1, 10)]
     bullet_img = pygame.transform.scale(pygame.image.load(os.path.join("Assets/Bullets", "light_bullet.png")), (10, 10))
     background = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "Background.png")), (win_width, win_height))
-    left_enemy = [pygame.image.load(os.path.join("Assets/Enemy", f"L{i}E.png")) for i in range(1, 9)] + \
-                 [pygame.image.load(os.path.join("Assets/Enemy", f"L{i}P.png")) for i in range(9, 12)]
-    right_enemy = [pygame.image.load(os.path.join("Assets/Enemy", f"R{i}E.png")) for i in range(1, 9)] + \
-                  [pygame.image.load(os.path.join("Assets/Enemy", f"R{i}P.png")) for i in range(9, 12)]
-                  
+    left_enemy =[pygame.image.load(os.path.join("Assets/Enemy", f"L{i}E.png")) for i in range(1, 9)] + \
+                [pygame.image.load(os.path.join("Assets/Enemy", f"L{i}P.png")) for i in range(9, 12)]
+    right_enemy =   [pygame.image.load(os.path.join("Assets/Enemy", f"R{i}E.png")) for i in range(1, 9)] + \
+                    [pygame.image.load(os.path.join("Assets/Enemy", f"R{i}P.png")) for i in range(9, 12)]
+                
     castle = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "Tower.png")), (200, 200))
     
     pygame.mixer.music.load(os.path.join("Assets/Audio", "music.ogg"))
@@ -124,7 +124,7 @@ class Enemy(pygame.sprite.Sprite):
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
-        super().__init__()
+        super()xs.__init__()
 
         self.image = bullet_img
         self.rect = self.image.get_rect(center=(x+15, y+25))
@@ -136,7 +136,7 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
     def draw(self, win):
-        print ("bullet.draw")
+
         win.blit(self.image, self.rect.topleft)
 
     def off_screen(self):
