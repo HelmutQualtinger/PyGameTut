@@ -133,3 +133,6 @@ comparison is done in python not in the pygame collision
 rectangles in multiple colors over the figure.
 
 ## lives
+
+## inherting from Sprites
+updating and drawing is called automaticall when collisions with groups are detected. update is overrriden from the inheriting class. draw is not. have to call explicitly if non-standard drawing routine is used
