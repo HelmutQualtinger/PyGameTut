@@ -1,7 +1,8 @@
 # Pygame learning
+
 watched [following videos](https://www.youtube.com/watch?v=cFq3dKa6q0o&t=337s)
 
-## first video:
+## first video
 
 ```py
 import pygame
@@ -40,11 +41,10 @@ while True:
 - `surface =pygame.display.set_mode((800, 600))`   create window with drawable surface
 - `clock = pygame.time.Clock()` checks the clockspeed
 - `if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):`
-- ` pygame.event.get()` get keyboard und mouse event
+- `pygame.event.get()` get keyboard und mouse event
 - `surface.fill()`  empties the surface
 - `pygame.draw.rect(surface, (128, 0, 0), (rect_x, rect_y, rect_width, rect_height))` draws a rectangle
 - `pygame.display.flip()  # Use flip instead of update for smoother animation` outputs it on the screen
-
 
 ## second video Movement
 
@@ -69,16 +69,20 @@ while True:
 
 in video lots of if and comparison, but min max suggested by Gemini is much less verbose and elegant.
 
+ ```py
     y = min(max(y, radius), 500 - radius)
     x = min(max(x, radius), 500 - radius)
+````
 
 ## changing speed in accordance with Newton and jump
+
 [jumping.py](jumping.py)
 
 Make the velocity variable. Change it when at each iteration.
 pygame.event.key.get_pressed() returns a dictionary with all pressed keys
 
 ## having a running background
+
 [background.py](background.py)]
 Load a png file
 
@@ -102,15 +106,16 @@ win.blit(bg, (width+i, 0))
 No particular sprite routines really using blit, load series of png to animate
 
 ## Objects
+
 [Part-07-Objects.py](Part-07-Objects.py)
 
 Combination of left right running with sequence of sprites and jumping
-
 
 Draw player class
 draws left, right or front facing sprite, Step Index cycles through mini film
 
 ## Shooting
+
 [Part-08-Shooting.py](Part-08-Shooting.py)
 Shoot bullets. New sprite. Bit of care placing the bullets and moving them.
 
@@ -128,11 +133,12 @@ created very much like player  Collisions and hitboxes
 implement hit methods called in the draw method to check wether we were hit
 comparison is done in python not in the pygame collision
 
-## Health bars.
+## Health bars
 
 rectangles in multiple colors over the figure.
 
 ## lives
 
-## inherting from Sprites
-updating and drawing is called automaticall when collisions with groups are detected. update is overrriden from the inheriting class. draw is not. have to call explicitly if non-standard drawing routine is used
+## inheriting from Sprites
+
+updating and drawing is called automatically when collisions with groups are detected. update is overridden from the inheriting class. draw is not. have to call explicitly if non-standard drawing routine is used
